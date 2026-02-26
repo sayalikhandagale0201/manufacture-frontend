@@ -1,17 +1,24 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-
   images: {
+    // Allows Next.js to optimize images coming from localhost:8080
     remotePatterns: [
       {
-        protocol: "https",
-        hostname: "your-backend-domain.com", 
+        protocol: "http",
+        hostname: "localhost",
+        port: "8080",
         pathname: "/uploads/**",
       },
     ],
+  },
+  // Optional: if you want to proxy instead of using remotePatterns
+  async rewrites() {
+    return [
+      {
+        source: '/uploads/:path*',
+        destination: 'http://localhost:8080/uploads/:path*',
+      },
+    ];
   },
 };
 
