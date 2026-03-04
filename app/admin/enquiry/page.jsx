@@ -9,16 +9,29 @@ const EnquiryTable = () => {
   useEffect(() => {
     const fetchEnquiries = async () => {
       try {
-        const res = await fetch("http://localhost:8080/api/enquiries/admin");
+        const res = await fetch("http://localhost:8080/api/enquiries/admin", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!res.ok) {
+          console.error("Failed to fetch enquiries:", res.status, res.statusText);
+          setEnquiries([]);
+          return;
+        }
+
         const data = await res.json();
         setEnquiries(Array.isArray(data) ? data : data.enquiries || []);
       } catch (err) {
-        console.error(err);
+        console.error("Error fetching enquiries:", err);
         setEnquiries([]);
       } finally {
         setLoading(false);
       }
     };
+
     fetchEnquiries();
   }, []);
 
@@ -28,7 +41,6 @@ const EnquiryTable = () => {
     <div className="flex-1 min-h-screen p-4 bg-white-50">
       <h1 className="text-2xl font-semibold mb-5">Enquiries</h1>
 
-      {/* Horizontal scroll container */}
       <div className="overflow-x-auto border border-gray-300 rounded-lg bg-white shadow-sm">
         <table className="min-w-full text-sm text-left border-collapse">
           <thead className="bg-gray-100">

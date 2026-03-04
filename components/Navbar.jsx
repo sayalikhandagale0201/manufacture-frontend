@@ -9,17 +9,16 @@ import { assets } from "@/assets/assets";
 const Navbar = () => {
   const router = useRouter();
 
-  const [open, setOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [query, setQuery] = useState("");
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    const role = localStorage.getItem("role"); // "ADMIN" or "USER"
+    const role = localStorage.getItem("role");
 
-    setIsLoggedIn(!!token);
-    setIsAdmin(role === "ADMIN");
+    if (token && role === "ADMIN") {
+      setIsAdmin(true);
+    }
   }, []);
 
   const handleSearch = (e) => {
@@ -32,9 +31,8 @@ const Navbar = () => {
   const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("role");
-    setIsLoggedIn(false);
     setIsAdmin(false);
-    router.push("/login");
+    router.push("/");
   };
 
   return (
@@ -79,65 +77,24 @@ const Navbar = () => {
           </button>
         </div>
 
-        {/* RIGHT */}
-        <div className="flex items-center gap-6">
-
-          {/* ADMIN DASHBOARD */}
-          {isAdmin && (
+        {/* ADMIN SECTION */}
+        {isAdmin && (
+          <div className="flex items-center gap-4">
             <button
-              onClick={() => router.push("/admin")}
+              onClick={() => router.push("/admin/dashboard")}
               className="text-xs border border-orange-500 px-4 py-1.5 rounded-full hover:bg-orange-600 hover:text-white transition"
             >
-              Dashboard
+              Admin Dashboard
             </button>
-          )}
 
-          {/* ACCOUNT */}
-          <div className="relative">
             <button
-              onClick={() => setOpen(!open)}
-              className="flex flex-col text-left leading-tight"
+              onClick={logout}
+              className="text-xs border border-red-500 px-4 py-1.5 rounded-full text-red-400 hover:bg-red-600 hover:text-white transition"
             >
-              <span className="text-xs text-gray-300">
-                {isLoggedIn ? "Hello," : "Welcome"}
-              </span>
-              <span className="text-sm font-medium">
-                {isLoggedIn ? "Account" : "Sign in"}
-              </span>
+              Logout
             </button>
-
-            {open && (
-              <div className="absolute right-0 mt-2 w-44 bg-slate-800 border border-gray-700 rounded shadow-lg text-white">
-                {!isLoggedIn ? (
-                  <>
-                    <Link
-                      href="/login"
-                      className="block px-4 py-2 hover:bg-orange-600 transition"
-                    >
-                      Login
-                    </Link>
-                    <Link
-                      href="/register"
-                      className="block px-4 py-2 hover:bg-orange-600 transition"
-                    >
-                      Register
-                    </Link>
-                  </>
-                ) : (
-                  <>
-                    
-                    <button
-                      onClick={logout}
-                      className="w-full text-left px-4 py-2 text-red-500 hover:bg-red-600 transition"
-                    >
-                      Logout
-                    </button>
-                  </>
-                )}
-              </div>
-            )}
           </div>
-        </div>
+        )}
       </div>
     </nav>
   );

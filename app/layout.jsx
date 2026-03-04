@@ -7,7 +7,7 @@ import Script from "next/script";
 const outfit = Outfit({ subsets: ["latin"], weight: ["300", "400", "500"] });
 
 export const metadata = {
-  title: "DKM Enterprises",
+  title: "DKM enterprises",
   description: "E-Commerce with Next.js",
 };
 
@@ -25,4 +25,4 @@ export default function RootLayout({ children }) {
       </body>
     </html>
   );
-}
+}  
