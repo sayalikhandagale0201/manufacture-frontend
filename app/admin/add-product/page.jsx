@@ -23,7 +23,7 @@ export default function AddProductClient() {
   const [preview, setPreview] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // Fetch product if editing
+  // Fetch product if edit mode
   useEffect(() => {
     if (!productId) return;
 
@@ -32,6 +32,9 @@ export default function AddProductClient() {
         const res = await fetch(
           `http://localhost:8080/api/products/${productId}`
         );
+
+        if (!res.ok) throw new Error("Failed to fetch");
+
         const data = await res.json();
 
         setForm({
@@ -44,15 +47,15 @@ export default function AddProductClient() {
         });
 
         if (data.imageUrls) {
-          const first = data.imageUrls.split(",")[0];
+          const firstImage = data.imageUrls.split(",")[0];
           setPreview(
-            first.startsWith("http")
-              ? first
-              : `http://localhost:8080/uploads/${first}`
+            firstImage.startsWith("http")
+              ? firstImage
+              : `http://localhost:8080/uploads/${firstImage}`
           );
         }
       } catch (err) {
-        console.error("Fetch failed:", err);
+        console.error("Fetch error:", err);
       }
     }
 
@@ -87,7 +90,9 @@ export default function AddProductClient() {
         formData.append(key, form[key]);
       });
 
-      if (file) formData.append("images", file);
+      if (file) {
+        formData.append("images", file);
+      }
 
       const url = productId
         ? `http://localhost:8080/api/products/${productId}`
@@ -95,7 +100,10 @@ export default function AddProductClient() {
 
       const method = productId ? "PUT" : "POST";
 
-      const res = await fetch(url, { method, body: formData });
+      const res = await fetch(url, {
+        method,
+        body: formData,
+      });
 
       if (!res.ok) throw new Error("Request failed");
 
@@ -113,22 +121,22 @@ export default function AddProductClient() {
     <div className="flex-1 min-h-screen px-4 md:px-10 py-6">
       <form onSubmit={handleSubmit} className="space-y-5 max-w-2xl">
 
-        {/* Image */}
+        {/* IMAGE */}
         <div>
           <p className="font-medium">Product Image</p>
-          <label className="relative mt-2 block w-[120px]">
+          <label className="block mt-2 w-[120px] cursor-pointer">
             <input type="file" hidden onChange={handleFileChange} />
             <Image
               src={preview || assets.upload_area}
-              alt="Preview"
+              alt="Product Preview"
               width={120}
               height={120}
-              className="border rounded cursor-pointer object-cover"
+              className="border rounded object-cover"
             />
           </label>
         </div>
 
-        {/* Name */}
+        {/* NAME */}
         <div>
           <label>Product Name</label>
           <input
@@ -141,7 +149,7 @@ export default function AddProductClient() {
           />
         </div>
 
-        {/* Description */}
+        {/* DESCRIPTION */}
         <div>
           <label>Description</label>
           <textarea
@@ -154,7 +162,7 @@ export default function AddProductClient() {
           />
         </div>
 
-        {/* Category */}
+        {/* CATEGORY */}
         <div>
           <label>Category</label>
           <select
@@ -171,7 +179,7 @@ export default function AddProductClient() {
           </select>
         </div>
 
-        {/* Checkboxes */}
+        {/* CHECKBOXES */}
         <div className="flex flex-col gap-2">
           {["headerSlider", "featured", "banner"].map((field) => (
             <label key={field} className="flex items-center gap-2">
