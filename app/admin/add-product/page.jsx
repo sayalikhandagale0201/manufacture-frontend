@@ -1,92 +1,105 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { assets } from "@/assets/assets";
 
-const AddProduct = () => {
+export default function AddProductClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const productId = searchParams.get("id");
 
+  const [form, setForm] = useState({
+    name: "",
+    description: "",
+    category: "Fasteners",
+    headerSlider: false,
+    featured: false,
+    banner: false,
+  });
+
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
-
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [category, setCategory] = useState("Fasteners");
-
-  // New checkboxes
-  const [headerSlider, setHeaderSlider] = useState(false);
-  const [featured, setFeatured] = useState(false);
-  const [banner, setBanner] = useState(false);
-
   const [loading, setLoading] = useState(false);
 
-  // Fetch product for edit
+  // Fetch product if editing
   useEffect(() => {
     if (!productId) return;
 
-    const fetchProduct = async () => {
+    async function fetchProduct() {
       try {
-        const res = await fetch(`http://localhost:8080/api/products/${productId}`);
+        const res = await fetch(
+          `http://localhost:8080/api/products/${productId}`
+        );
         const data = await res.json();
 
-        setName(data.name);
-        setDescription(data.description);
-        setCategory(data.category);
-
-        // Checkboxes
-        setHeaderSlider(data.headerSlider || false);
-        setFeatured(data.featured || false);
-        setBanner(data.banner || false);
+        setForm({
+          name: data.name || "",
+          description: data.description || "",
+          category: data.category || "Fasteners",
+          headerSlider: data.headerSlider || false,
+          featured: data.featured || false,
+          banner: data.banner || false,
+        });
 
         if (data.imageUrls) {
           const first = data.imageUrls.split(",")[0];
-          setPreview(first.startsWith("http") ? first : `http://localhost:8080/uploads/${first}`);
+          setPreview(
+            first.startsWith("http")
+              ? first
+              : `http://localhost:8080/uploads/${first}`
+          );
         }
       } catch (err) {
-        console.error("Fetch product failed:", err);
+        console.error("Fetch failed:", err);
       }
-    };
+    }
 
     fetchProduct();
   }, [productId]);
 
-  const handleFileChange = (e) => {
-    const selected = e.target.files[0];
+  function handleChange(e) {
+    const { name, value, type, checked } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  }
+
+  function handleFileChange(e) {
+    const selected = e.target.files?.[0];
     if (!selected) return;
     setFile(selected);
     setPreview(URL.createObjectURL(selected));
-  };
+  }
 
-  const handleSubmit = async (e) => {
+  async function handleSubmit(e) {
     e.preventDefault();
     if (loading) return;
+
     setLoading(true);
 
     try {
       const formData = new FormData();
-      formData.append("name", name);
-      formData.append("description", description);
-      formData.append("category", category);
-      if (file) formData.append("images", file);
 
-      // Append checkboxes
-      formData.append("headerSlider", headerSlider);
-      formData.append("featured", featured);
-      formData.append("banner", banner);
+      Object.keys(form).forEach((key) => {
+        formData.append(key, form[key]);
+      });
+
+      if (file) formData.append("images", file);
 
       const url = productId
         ? `http://localhost:8080/api/products/${productId}`
         : `http://localhost:8080/api/products`;
+
       const method = productId ? "PUT" : "POST";
 
       const res = await fetch(url, { method, body: formData });
-      if (!res.ok) throw new Error("Failed");
 
-      alert(productId ? "Product updated" : "Product added");
+      if (!res.ok) throw new Error("Request failed");
+
+      alert(productId ? "Product Updated" : "Product Added");
       router.push("/admin/product-list");
     } catch (err) {
       console.error(err);
@@ -94,58 +107,61 @@ const AddProduct = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   return (
-    <div className="flex-1 min-h-screen pt-0 md:pt-2 px-4 md:px-10">
+    <div className="flex-1 min-h-screen px-4 md:px-10 py-6">
       <form onSubmit={handleSubmit} className="space-y-5 max-w-2xl">
 
-        {/* IMAGE */}
+        {/* Image */}
         <div>
-          <p className="text-base font-medium">Product Image</p>
-          <label className="relative mt-2">
+          <p className="font-medium">Product Image</p>
+          <label className="relative mt-2 block w-[120px]">
             <input type="file" hidden onChange={handleFileChange} />
             <Image
               src={preview || assets.upload_area}
-              alt="Product Image"
+              alt="Preview"
               width={120}
               height={120}
-              className="cursor-pointer border rounded object-cover"
+              className="border rounded cursor-pointer object-cover"
             />
           </label>
         </div>
 
-        {/* NAME */}
-        <div className="flex flex-col gap-1">
+        {/* Name */}
+        <div>
           <label>Product Name</label>
           <input
             type="text"
+            name="name"
+            value={form.name}
+            onChange={handleChange}
             required
-            className="border px-3 py-2 rounded"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            className="border px-3 py-2 rounded w-full"
           />
         </div>
 
-        {/* DESCRIPTION */}
-        <div className="flex flex-col gap-1">
+        {/* Description */}
+        <div>
           <label>Description</label>
           <textarea
             rows={4}
+            name="description"
+            value={form.description}
+            onChange={handleChange}
             required
-            className="border px-3 py-2 rounded resize-none"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            className="border px-3 py-2 rounded w-full resize-none"
           />
         </div>
 
-        {/* CATEGORY */}
-        <div className="flex flex-col gap-1">
+        {/* Category */}
+        <div>
           <label>Category</label>
           <select
-            className="border px-3 py-2 rounded"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
+            name="category"
+            value={form.category}
+            onChange={handleChange}
+            className="border px-3 py-2 rounded w-full"
           >
             <option>Fasteners</option>
             <option>Bolts</option>
@@ -155,35 +171,19 @@ const AddProduct = () => {
           </select>
         </div>
 
-        {/* CHECKBOXES */}
-        <div className="flex flex-col gap-2 mt-2">
-          <label className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={headerSlider}
-              onChange={(e) => setHeaderSlider(e.target.checked)}
-              className="w-4 h-4"
-            />
-            Header Slider
-          </label>
-          <label className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={featured}
-              onChange={(e) => setFeatured(e.target.checked)}
-              className="w-4 h-4"
-            />
-            Featured
-          </label>
-          <label className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={banner}
-              onChange={(e) => setBanner(e.target.checked)}
-              className="w-4 h-4"
-            />
-            Banner
-          </label>
+        {/* Checkboxes */}
+        <div className="flex flex-col gap-2">
+          {["headerSlider", "featured", "banner"].map((field) => (
+            <label key={field} className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                name={field}
+                checked={form[field]}
+                onChange={handleChange}
+              />
+              {field}
+            </label>
+          ))}
         </div>
 
         <button
@@ -191,11 +191,13 @@ const AddProduct = () => {
           disabled={loading}
           className="px-8 py-2 bg-orange-600 text-white rounded disabled:opacity-50"
         >
-          {loading ? "Saving..." : productId ? "UPDATE PRODUCT" : "ADD PRODUCT"}
+          {loading
+            ? "Saving..."
+            : productId
+            ? "UPDATE PRODUCT"
+            : "ADD PRODUCT"}
         </button>
       </form>
     </div>
   );
-};
-
-export default AddProduct;
+}
