@@ -5,7 +5,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { assets } from "@/assets/assets";
 
-const Sidebar = () => {
+const Sidebar = ({ closeSidebar }) => {
   const pathname = usePathname();
 
   const menuItems = [
@@ -15,13 +15,23 @@ const Sidebar = () => {
   ];
 
   return (
-    <aside className="w-16 md:w-64 bg-white border-r border-gray-200 min-h-screen sticky top-0 flex flex-col">
+    <aside className="w-64 bg-white border-r border-gray-200 min-h-screen flex flex-col">
 
       {/* BRAND */}
-      <div className="flex items-center justify-center md:justify-start px-4 py-4 border-b">
-        <span className="text-lg md:text-xl font-bold text-orange-600 hidden md:block">
+      <div className="flex items-center justify-between px-4 py-4 border-b">
+
+        <span className="text-lg md:text-xl font-bold text-orange-600">
           DKM Enterprises
         </span>
+
+        {/* mobile close button */}
+        <button
+          onClick={closeSidebar}
+          className="md:hidden text-xl text-gray-600"
+        >
+          ✕
+        </button>
+
       </div>
 
       {/* MENU */}
@@ -31,7 +41,7 @@ const Sidebar = () => {
           const isActive = pathname === item.path;
 
           return (
-            <Link key={item.name} href={item.path}>
+            <Link key={item.name} href={item.path} onClick={closeSidebar}>
               <div
                 className={`flex items-center gap-3 px-3 py-3 rounded-lg cursor-pointer transition-all
                 ${
@@ -47,7 +57,7 @@ const Sidebar = () => {
                   height={22}
                 />
 
-                <span className="hidden md:block text-sm font-medium">
+                <span className="text-sm font-medium">
                   {item.name}
                 </span>
               </div>
@@ -56,6 +66,7 @@ const Sidebar = () => {
         })}
 
       </nav>
+
     </aside>
   );
 };
