@@ -13,10 +13,10 @@ const Footer = () => {
     <footer className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-gray-300">
 
       {/* TOP SECTION */}
-      <div className="flex flex-col md:flex-row justify-between gap-10 px-6 md:px-16 lg:px-32 py-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 md:py-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
 
-        {/* LEFT: COMPANY INFO */}
-        <div className="w-full md:w-1/3 flex flex-col gap-4">
+        {/* COMPANY INFO */}
+        <div className="flex flex-col gap-4">
           <h2 className="text-white font-semibold text-lg tracking-wide">
             DKM ENTERPRISES
           </h2>
@@ -42,9 +42,10 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* CENTER: LINKS */}
-        <div className="w-full md:w-1/3">
+        {/* QUICK LINKS */}
+        <div>
           <h3 className="text-white font-semibold mb-4">Quick Links</h3>
+
           <ul className="space-y-2 text-sm">
             <li><Link href="/" className="hover:text-orange-400">Home</Link></li>
             <li><Link href="/about" className="hover:text-orange-400">About</Link></li>
@@ -53,8 +54,8 @@ const Footer = () => {
           </ul>
         </div>
 
-        {/* RIGHT: CONTACT */}
-        <div className="w-full md:w-1/3 flex flex-col gap-3 text-sm">
+        {/* CONTACT */}
+        <div className="flex flex-col gap-3 text-sm">
           <h3 className="text-white font-semibold">Contact Us</h3>
 
           <p>
@@ -82,18 +83,26 @@ const Footer = () => {
             Open in Google Maps
           </a>
         </div>
+
       </div>
 
       {/* BOTTOM BAR */}
-      <div className="border-t border-white/10 px-6 md:px-16 lg:px-32 py-4 flex flex-col md:flex-row justify-between items-center text-xs text-gray-400">
-        <p>© 2026 DKM ENTERPRISES. All rights reserved.</p>
-        <div className="flex gap-4 mt-2 md:mt-0">
-          <Link href="/privacy-policy" className="hover:text-orange-400">
-            Privacy Policy
-          </Link>
-          <Link href="/terms" className="hover:text-orange-400">
-            Terms
-          </Link>
+      <div className="border-t border-white/10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col md:flex-row justify-between items-center text-xs text-gray-400 gap-2">
+
+          <p className="text-center md:text-left">
+            © 2026 DKM ENTERPRISES. All rights reserved.
+          </p>
+
+          <div className="flex gap-4">
+            <Link href="/privacy-policy" className="hover:text-orange-400">
+              Privacy Policy
+            </Link>
+            <Link href="/terms" className="hover:text-orange-400">
+              Terms
+            </Link>
+          </div>
+
         </div>
       </div>
 

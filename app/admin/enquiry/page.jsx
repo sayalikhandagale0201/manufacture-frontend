@@ -9,24 +9,17 @@ const EnquiryTable = () => {
   useEffect(() => {
     const fetchEnquiries = async () => {
       try {
-        const res = await fetch("http://localhost:8080/api/enquiries/admin", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+        const res = await fetch("http://localhost:8080/api/enquiries/admin");
 
         if (!res.ok) {
-          console.error("Failed to fetch enquiries:", res.status, res.statusText);
-          setEnquiries([]);
+          console.error("Failed to fetch enquiries");
           return;
         }
 
         const data = await res.json();
-        setEnquiries(Array.isArray(data) ? data : data.enquiries || []);
+        setEnquiries(Array.isArray(data) ? data : data?.enquiries || []);
       } catch (err) {
-        console.error("Error fetching enquiries:", err);
-        setEnquiries([]);
+        console.error("Error:", err);
       } finally {
         setLoading(false);
       }
@@ -38,34 +31,60 @@ const EnquiryTable = () => {
   if (loading) return <Loading />;
 
   return (
-    <div className="flex-1 min-h-screen p-4 bg-white-50">
-      <h1 className="text-2xl font-semibold mb-5">Enquiries</h1>
+    <div className="flex-1 min-h-screen p-3 sm:p-6 bg-gray-50">
 
-      <div className="overflow-x-auto border border-gray-300 rounded-lg bg-white shadow-sm">
-        <table className="min-w-full text-sm text-left border-collapse">
+      <h1 className="text-xl sm:text-2xl font-semibold mb-4 sm:mb-6">
+        Enquiries
+      </h1>
+
+      {/* Responsive Table */}
+      <div className="w-full overflow-x-auto border border-gray-200 rounded-lg bg-white shadow-sm">
+
+        <table className="min-w-[900px] w-full text-xs sm:text-sm text-left">
+
           <thead className="bg-gray-100">
             <tr>
-              <th className="px-4 py-2 border">Name</th>
-              <th className="px-4 py-2 border">Phone</th>
-              <th className="px-4 py-2 border">Enquiry Type</th>
-              <th className="px-4 py-2 border">Email</th>
-              <th className="px-4 py-2 border">Material</th>
-              <th className="px-4 py-2 border">Message</th>
-              <th className="px-4 py-2 border">Date</th>
-              <th className="px-4 py-2 border">Status</th>
+              <th className="px-3 sm:px-4 py-2 border">Name</th>
+              <th className="px-3 sm:px-4 py-2 border">Phone</th>
+              <th className="px-3 sm:px-4 py-2 border">Type</th>
+              <th className="px-3 sm:px-4 py-2 border">Email</th>
+              <th className="px-3 sm:px-4 py-2 border">Material</th>
+              <th className="px-3 sm:px-4 py-2 border">Message</th>
+              <th className="px-3 sm:px-4 py-2 border">Date</th>
+              <th className="px-3 sm:px-4 py-2 border">Status</th>
             </tr>
           </thead>
+
           <tbody>
             {enquiries.length > 0 ? (
               enquiries.map((e) => (
                 <tr key={e.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-2 border">{e.name}</td>
-                  <td className="px-4 py-2 border">{e.phone}</td>
-                  <td className="px-4 py-2 border">{e.enquiryType || e.enquiry_type}</td>
-                  <td className="px-4 py-2 border">{e.email}</td>
-                  <td className="px-4 py-2 border">{e.product}</td>
-                  <td className="px-4 py-2 border max-w-xs truncate">{e.message}</td>
-                  <td className="px-4 py-2 border">
+
+                  <td className="px-3 sm:px-4 py-2 border whitespace-nowrap">
+                    {e.name}
+                  </td>
+
+                  <td className="px-3 sm:px-4 py-2 border whitespace-nowrap">
+                    {e.phone}
+                  </td>
+
+                  <td className="px-3 sm:px-4 py-2 border whitespace-nowrap">
+                    {e.enquiryType || e.enquiry_type}
+                  </td>
+
+                  <td className="px-3 sm:px-4 py-2 border">
+                    {e.email}
+                  </td>
+
+                  <td className="px-3 sm:px-4 py-2 border">
+                    {e.product}
+                  </td>
+
+                  <td className="px-3 sm:px-4 py-2 border max-w-[200px] truncate">
+                    {e.message}
+                  </td>
+
+                  <td className="px-3 sm:px-4 py-2 border whitespace-nowrap">
                     {e.date
                       ? new Date(e.date).toLocaleString("en-IN", {
                           dateStyle: "medium",
@@ -73,18 +92,24 @@ const EnquiryTable = () => {
                         })
                       : "-"}
                   </td>
-                  <td className="px-4 py-2 border">{e.status || "Pending"}</td>
+
+                  <td className="px-3 sm:px-4 py-2 border whitespace-nowrap">
+                    {e.status || "Pending"}
+                  </td>
+
                 </tr>
               ))
             ) : (
               <tr>
                 <td colSpan={8} className="text-center py-6 text-gray-500">
-                  No enquiries found.
+                  No enquiries found
                 </td>
               </tr>
             )}
           </tbody>
+
         </table>
+
       </div>
     </div>
   );

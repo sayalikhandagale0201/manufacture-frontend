@@ -11,13 +11,16 @@ export default function SearchClient() {
 
   const [products, setProducts] = useState([]);
 
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
   useEffect(() => {
     if (!query) return;
 
-    fetch(`http://localhost:8080/api/products/search?q=${query}`)
+    fetch(`${API_URL}/api/products/search?q=${query}`)
       .then(res => res.json())
-      .then(data => setProducts(Array.isArray(data) ? data : []));
-  }, [query]);
+      .then(data => setProducts(Array.isArray(data) ? data : []))
+      .catch(() => setProducts([]));
+  }, [query, API_URL]);
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-10 bg-slate-900 min-h-screen text-white">
@@ -31,7 +34,9 @@ export default function SearchClient() {
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
         {products.map(product => {
-          const firstImg = product.imageUrls?.split(",")[0] || "/placeholder.png";
+          const firstImg =
+            product.imageUrls?.split(",")[0] || "/placeholder.png";
+
           return (
             <Link key={product.id} href={`/product/${product.id}`}>
               <div className="bg-slate-800 rounded-xl overflow-hidden shadow-lg hover:shadow-orange-500/50 transition cursor-pointer">

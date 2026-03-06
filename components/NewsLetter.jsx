@@ -7,8 +7,14 @@ const NewsLetter = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
-  const handleSubscribe = async () => {
-    if (!email || !email.includes("@")) {
+  const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+
+  const handleSubscribe = async (e) => {
+    e.preventDefault();
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(email)) {
       setMessage("Please enter a valid email address");
       return;
     }
@@ -17,26 +23,33 @@ const NewsLetter = () => {
       setLoading(true);
       setMessage("");
 
-      const res = await fetch("http://localhost:8080/api/newsletter", {
+      const res = await fetch(`${API}/api/newsletter`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({ email }),
       });
 
       const text = await res.text();
-      setMessage(text);
+
+      if (!res.ok) {
+        throw new Error(text || "Subscription failed");
+      }
+
+      setMessage(text || "Subscribed successfully!");
       setEmail("");
-    } catch {
-      setMessage("Something went wrong. Please try again.");
+
+      setTimeout(() => setMessage(""), 4000);
+    } catch (err) {
+      setMessage(err.message || "Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-
     <section className="bg-[#E6E9F2] py-20 mt-16">
-
       <div className="max-w-6xl mx-auto rounded-2xl overflow-hidden bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 shadow-xl relative">
 
         {/* ORANGE GLOW */}
@@ -58,8 +71,11 @@ const NewsLetter = () => {
             quotation details.
           </p>
 
-          {/* INPUT */}
-          <div className="mt-10 flex flex-col sm:flex-row items-center gap-4 max-w-xl mx-auto">
+          {/* FORM */}
+          <form
+            onSubmit={handleSubscribe}
+            className="mt-10 flex flex-col sm:flex-row items-center gap-4 max-w-xl mx-auto"
+          >
             <input
               type="email"
               value={email}
@@ -69,13 +85,13 @@ const NewsLetter = () => {
             />
 
             <button
-              onClick={handleSubscribe}
+              type="submit"
               disabled={loading}
               className="h-12 px-8 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition disabled:opacity-60"
             >
               {loading ? "Submitting..." : "Get Updates"}
             </button>
-          </div>
+          </form>
 
           {/* MESSAGE */}
           {message && (

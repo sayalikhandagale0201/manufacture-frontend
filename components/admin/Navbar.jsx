@@ -1,17 +1,26 @@
 import React from "react";
-import { assets } from "@/assets/assets";
 import Image from "next/image";
+import { assets } from "@/assets/assets";
 
 const Navbar = () => {
   return (
-    <div className="flex items-center px-4 md:px-8 py-3 justify-between border-b bg-white">
-    <div className="flex items-center gap-3">
-        <span className="text-2xl font-bold text-orange-600">DKM Enterprises</span>
+    <header className="w-full bg-white border-b sticky top-0 z-40">
+      <div className="flex items-center justify-between px-4 md:px-8 py-3">
+
+        {/* LEFT LOGO */}
+        <div className="flex items-center gap-2">
+          <span className="text-xl md:text-2xl font-bold text-orange-600">
+            DKM Enterprises
+          </span>
+        </div>
+
+        {/* RIGHT ACTION */}
+        <button className="flex items-center gap-2 bg-gray-700 hover:bg-gray-800 text-white px-4 py-2 md:px-6 rounded-full text-xs md:text-sm transition">
+          Logout
+        </button>
+
       </div>
-      <button className="bg-gray-600 text-white px-5 py-2 sm:px-7 sm:py-2 rounded-full text-xs sm:text-sm">
-        Logout
-      </button>
-    </div>
+    </header>
   );
 };
 

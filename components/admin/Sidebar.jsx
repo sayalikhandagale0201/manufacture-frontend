@@ -5,7 +5,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { assets } from "@/assets/assets";
 
-const SideBar = () => {
+const Sidebar = () => {
   const pathname = usePathname();
 
   const menuItems = [
@@ -15,40 +15,49 @@ const SideBar = () => {
   ];
 
   return (
-    <div className="md:w-64 w-16 border-r min-h-screen text-base border-gray-300 py-4 flex flex-col bg-white">
-      
-      {/* Company branding at top */}
-      <div className="flex items-center justify-center md:justify-start px-4 mb-6">
-        <span className="text-xl font-bold text-orange-600 md:block hidden">
+    <aside className="w-16 md:w-64 bg-white border-r border-gray-200 min-h-screen sticky top-0 flex flex-col">
+
+      {/* BRAND */}
+      <div className="flex items-center justify-center md:justify-start px-4 py-4 border-b">
+        <span className="text-lg md:text-xl font-bold text-orange-600 hidden md:block">
           DKM Enterprises
         </span>
       </div>
 
-      {/* Menu items */}
-      {menuItems.map((item) => {
-        const isActive = pathname === item.path;
-        return (
-          <Link href={item.path} key={item.name} passHref>
-            <div
-              className={`flex items-center py-3 px-4 gap-3 cursor-pointer transition-colors duration-200
+      {/* MENU */}
+      <nav className="flex flex-col gap-1 p-2">
+
+        {menuItems.map((item) => {
+          const isActive = pathname === item.path;
+
+          return (
+            <Link key={item.name} href={item.path}>
+              <div
+                className={`flex items-center gap-3 px-3 py-3 rounded-lg cursor-pointer transition-all
                 ${
                   isActive
                     ? "bg-orange-100 text-orange-600 border-r-4 border-orange-600"
-                    : "hover:bg-orange-50 hover:text-orange-600 border-white text-gray-700"
-                } rounded-md mx-2 mb-1`}
-            >
-              <Image
-                src={item.icon}
-                alt={`${item.name.toLowerCase()}_icon`}
-                className={`w-7 h-7 ${isActive ? "filter brightness-110" : ""}`}
-              />
-              <p className="md:block hidden font-medium">{item.name}</p>
-            </div>
-          </Link>
-        );
-      })}
-    </div>
+                    : "text-gray-700 hover:bg-orange-50 hover:text-orange-600"
+                }`}
+              >
+                <Image
+                  src={item.icon}
+                  alt={item.name}
+                  width={22}
+                  height={22}
+                />
+
+                <span className="hidden md:block text-sm font-medium">
+                  {item.name}
+                </span>
+              </div>
+            </Link>
+          );
+        })}
+
+      </nav>
+    </aside>
   );
 };
 
-export default SideBar;
+export default Sidebar;

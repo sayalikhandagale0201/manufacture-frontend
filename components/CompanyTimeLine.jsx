@@ -23,46 +23,52 @@ export default function CompanyTimeline() {
   ];
 
   return (
-    <section className="w-full px-6 md:px-20 py-16 bg-slate-950 text-white">
+    <section className="w-full px-4 sm:px-6 md:px-20 py-12 md:py-16 bg-slate-950 text-white">
+      
       {/* Heading */}
-      <div className="text-center mb-12">
-        <h2 className="text-3xl md:text-4xl font-semibold">
+      <div className="text-center mb-10 md:mb-12">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold">
           Our Journey
         </h2>
-        <p className="text-gray-400 mt-2">
+        <p className="text-gray-400 mt-2 text-sm sm:text-base">
           A timeline of growth, trust, and excellence
         </p>
       </div>
 
       {/* Timeline */}
-      <div className="relative max-w-4xl mx-auto">
-        {/* Center line */}
-        <div className="absolute left-1/2 top-0 h-full w-[2px] bg-gray-700 -translate-x-1/2" />
+      <div className="relative max-w-5xl mx-auto">
+
+        {/* Center line (desktop only) */}
+        <div className="hidden md:block absolute left-1/2 top-0 h-full w-[2px] bg-gray-700 -translate-x-1/2" />
 
         {timeline.map((item, index) => (
           <div
             key={index}
-            className={`relative mb-12 flex ${
-              index % 2 === 0 ? "justify-start" : "justify-end"
+            className={`relative mb-10 md:mb-12 flex flex-col md:flex-row ${
+              index % 2 === 0 ? "md:justify-start" : "md:justify-end"
             }`}
           >
             {/* Content box */}
-            <div className="w-full md:w-[45%] bg-slate-900 border border-gray-700 rounded-xl p-6 shadow-lg">
+            <div className="w-full md:w-[45%] bg-slate-900 border border-gray-700 rounded-xl p-5 md:p-6 shadow-lg">
+              
               <span className="text-orange-500 font-semibold text-sm">
                 {item.year}
               </span>
-              <h3 className="text-lg font-semibold mt-1">
+
+              <h3 className="text-base md:text-lg font-semibold mt-1">
                 {item.title}
               </h3>
-              <p className="text-gray-400 text-sm mt-2">
+
+              <p className="text-gray-400 text-sm mt-2 leading-relaxed">
                 {item.desc}
               </p>
             </div>
 
             {/* Dot */}
-            <div className="absolute left-1/2 top-6 w-4 h-4 bg-orange-500 rounded-full -translate-x-1/2 border-4 border-slate-950" />
+            <div className="hidden md:block absolute left-1/2 top-6 w-4 h-4 bg-orange-500 rounded-full -translate-x-1/2 border-4 border-slate-950" />
           </div>
         ))}
+
       </div>
     </section>
   );

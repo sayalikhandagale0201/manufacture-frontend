@@ -4,13 +4,16 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
+const API_BASE = "http://localhost:8080";
+
 const HomeProducts = () => {
   const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch("http://localhost:8080/api/products");
+        const res = await fetch(`${API_BASE}/api/products`);
         const data = await res.json();
 
         const normalProducts = Array.isArray(data)
@@ -21,11 +24,15 @@ const HomeProducts = () => {
       } catch (err) {
         console.error("Failed to fetch products:", err);
         setProducts([]);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchProducts();
   }, []);
+
+  if (loading) return null;
 
   return (
     <section className="max-w-7xl mx-auto px-6 py-16">
@@ -37,15 +44,26 @@ const HomeProducts = () => {
         <div className="w-24 h-1 bg-orange-600 mx-auto mt-3"></div>
       </div>
 
+      {/* EMPTY STATE */}
+      {products.length === 0 && (
+        <p className="text-center text-gray-500">
+          No products available
+        </p>
+      )}
+
       {/* GRID */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-        {products.map((product) => {
-          const firstImage =
-            product.imageUrls?.split(",")[0]?.trim() || "/placeholder.png";
+        {products.map((product, index) => {
+          const img = product.imageUrls?.split(",")[0]?.trim();
+
+          const imageUrl =
+            img && img.startsWith("http")
+              ? img
+              : `${API_BASE}/uploads/${img}`;
 
           return (
             <Link
-              key={product.id}
+              key={product.id || index}
               href={`/product/${product.id}`}
               className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border border-white/10 shadow-lg hover:shadow-orange-500/20 transition"
             >
@@ -55,11 +73,12 @@ const HomeProducts = () => {
               {/* IMAGE */}
               <div className="relative z-10 bg-slate-800/60 rounded-lg m-4 p-4 flex justify-center">
                 <Image
-                  src={firstImage}
-                  alt={product.name}
+                  src={imageUrl || "/placeholder.png"}
+                  alt={product.name || "Product"}
                   width={180}
                   height={180}
                   className="object-contain group-hover:scale-105 transition duration-500"
+                  priority={index < 2}
                 />
               </div>
 

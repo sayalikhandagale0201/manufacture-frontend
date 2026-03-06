@@ -17,14 +17,13 @@ const AddProduct = () => {
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("Fasteners");
 
-  // New checkboxes
   const [headerSlider, setHeaderSlider] = useState(false);
   const [featured, setFeatured] = useState(false);
   const [banner, setBanner] = useState(false);
 
   const [loading, setLoading] = useState(false);
 
-  // Fetch product for edit
+  // Fetch product when editing
   useEffect(() => {
     if (!productId) return;
 
@@ -33,18 +32,21 @@ const AddProduct = () => {
         const res = await fetch(`http://localhost:8080/api/products/${productId}`);
         const data = await res.json();
 
-        setName(data.name);
-        setDescription(data.description);
-        setCategory(data.category);
+        setName(data.name || "");
+        setDescription(data.description || "");
+        setCategory(data.category || "Fasteners");
 
-        // Checkboxes
-        setHeaderSlider(data.headerSlider || false);
-        setFeatured(data.featured || false);
-        setBanner(data.banner || false);
+        setHeaderSlider(data.headerSlider ?? false);
+        setFeatured(data.featured ?? false);
+        setBanner(data.banner ?? false);
 
         if (data.imageUrls) {
-          const first = data.imageUrls.split(",")[0];
-          setPreview(first.startsWith("http") ? first : `http://localhost:8080/uploads/${first}`);
+          const first = data.imageUrls.split(",")[0].trim();
+          setPreview(
+            first.startsWith("http")
+              ? first
+              : `http://localhost:8080/uploads/${first}`
+          );
         }
       } catch (err) {
         console.error("Fetch product failed:", err);
@@ -54,39 +56,53 @@ const AddProduct = () => {
     fetchProduct();
   }, [productId]);
 
+  // Image change
   const handleFileChange = (e) => {
-    const selected = e.target.files[0];
+    const selected = e.target.files?.[0];
     if (!selected) return;
+
+    const previewUrl = URL.createObjectURL(selected);
     setFile(selected);
-    setPreview(URL.createObjectURL(selected));
+    setPreview(previewUrl);
   };
 
+  // Submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (loading) return;
+
     setLoading(true);
 
     try {
       const formData = new FormData();
+
       formData.append("name", name);
       formData.append("description", description);
       formData.append("category", category);
-      if (file) formData.append("images", file);
 
-      // Append checkboxes
-      formData.append("headerSlider", headerSlider);
-      formData.append("featured", featured);
-      formData.append("banner", banner);
+      if (file) {
+        formData.append("images", file);
+      }
+
+      formData.append("headerSlider", headerSlider ? "true" : "false");
+      formData.append("featured", featured ? "true" : "false");
+      formData.append("banner", banner ? "true" : "false");
 
       const url = productId
         ? `http://localhost:8080/api/products/${productId}`
         : `http://localhost:8080/api/products`;
+
       const method = productId ? "PUT" : "POST";
 
-      const res = await fetch(url, { method, body: formData });
+      const res = await fetch(url, {
+        method,
+        body: formData,
+      });
+
       if (!res.ok) throw new Error("Failed");
 
-      alert(productId ? "Product updated" : "Product added");
+      alert(productId ? "Product updated successfully" : "Product added successfully");
+
       router.push("/admin/product-list");
     } catch (err) {
       console.error(err);
@@ -97,14 +113,16 @@ const AddProduct = () => {
   };
 
   return (
-    <div className="flex-1 min-h-screen pt-0 md:pt-2 px-4 md:px-10">
+    <div className="flex-1 min-h-screen pt-2 px-4 md:px-10">
       <form onSubmit={handleSubmit} className="space-y-5 max-w-2xl">
 
         {/* IMAGE */}
         <div>
           <p className="text-base font-medium">Product Image</p>
-          <label className="relative mt-2">
+
+          <label className="relative mt-2 inline-block">
             <input type="file" hidden onChange={handleFileChange} />
+
             <Image
               src={preview || assets.upload_area}
               alt="Product Image"
@@ -118,6 +136,7 @@ const AddProduct = () => {
         {/* NAME */}
         <div className="flex flex-col gap-1">
           <label>Product Name</label>
+
           <input
             type="text"
             required
@@ -130,6 +149,7 @@ const AddProduct = () => {
         {/* DESCRIPTION */}
         <div className="flex flex-col gap-1">
           <label>Description</label>
+
           <textarea
             rows={4}
             required
@@ -142,6 +162,7 @@ const AddProduct = () => {
         {/* CATEGORY */}
         <div className="flex flex-col gap-1">
           <label>Category</label>
+
           <select
             className="border px-3 py-2 rounded"
             value={category}
@@ -157,6 +178,7 @@ const AddProduct = () => {
 
         {/* CHECKBOXES */}
         <div className="flex flex-col gap-2 mt-2">
+
           <label className="flex items-center gap-2">
             <input
               type="checkbox"
@@ -166,6 +188,7 @@ const AddProduct = () => {
             />
             Header Slider
           </label>
+
           <label className="flex items-center gap-2">
             <input
               type="checkbox"
@@ -175,6 +198,7 @@ const AddProduct = () => {
             />
             Featured
           </label>
+
           <label className="flex items-center gap-2">
             <input
               type="checkbox"
@@ -184,6 +208,7 @@ const AddProduct = () => {
             />
             Banner
           </label>
+
         </div>
 
         <button
@@ -191,8 +216,13 @@ const AddProduct = () => {
           disabled={loading}
           className="px-8 py-2 bg-orange-600 text-white rounded disabled:opacity-50"
         >
-          {loading ? "Saving..." : productId ? "UPDATE PRODUCT" : "ADD PRODUCT"}
+          {loading
+            ? "Saving..."
+            : productId
+            ? "UPDATE PRODUCT"
+            : "ADD PRODUCT"}
         </button>
+
       </form>
     </div>
   );
