@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useState } from "react";
 
@@ -7,7 +7,7 @@ const NewsLetter = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
-  const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+  const API = process.env.NEXT_PUBLIC_API_URL; // Production URL from env
 
   const handleSubscribe = async (e) => {
     e.preventDefault();

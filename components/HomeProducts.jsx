@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
-const API_BASE = "http://localhost:8080";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
 const HomeProducts = () => {
   const [products, setProducts] = useState([]);

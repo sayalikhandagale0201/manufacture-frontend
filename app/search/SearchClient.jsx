@@ -11,6 +11,7 @@ export default function SearchClient() {
 
   const [products, setProducts] = useState([]);
 
+  // Use deployed backend URL from env
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
   useEffect(() => {

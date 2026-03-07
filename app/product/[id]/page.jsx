@@ -8,40 +8,62 @@ const ProductDetailPage = () => {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [activeImage, setActiveImage] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products/${id}`)
-      .then((res) => res.json())
-      .then((data) => {
+    if (!id) return;
+
+    const fetchProduct = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch(`${API_URL}/api/products/${id}`);
+        if (!res.ok) throw new Error("Failed to fetch product");
+
+        const data = await res.json();
         setProduct(data);
 
         if (data.imageUrls) {
-          const imgs = data.imageUrls.split(",");
+          const imgs = data.imageUrls.split(",").map(img => img.trim());
           setActiveImage(imgs[0]);
         }
-      })
-      .catch(() => {
-        console.error("Failed to load product");
-      });
-  }, [id]);
+      } catch (err) {
+        console.error("Error loading product:", err);
+        setProduct(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [id, API_URL]);
+
+  if (loading) {
+    return (
+      <p className="p-10 text-center text-orange-400">Loading...</p>
+    );
+  }
 
   if (!product) {
     return (
-      <p className="p-10 text-center text-orange-400">
-        Loading...
+      <p className="p-10 text-center text-red-500">
+        Product not found.
       </p>
     );
   }
 
-  const images = product.imageUrls ? product.imageUrls.split(",") : [];
+  const images = product.imageUrls
+    ? product.imageUrls.split(",").map(img => img.trim())
+    : [];
 
   return (
     <section className="max-w-7xl mx-auto px-6 md:px-16 lg:px-32 py-12 grid grid-cols-1 md:grid-cols-2 gap-10">
 
       {/* LEFT IMAGE */}
       <div>
-        <div className="border rounded-2xl bg-slate-900 flex items-center justify-center h-96 relative">
-          {activeImage && (
+        <div className="border rounded-2xl bg-gray-100 dark:bg-slate-900 flex items-center justify-center h-96 relative">
+          {activeImage ? (
             <Image
               src={activeImage}
               alt={product.name}
@@ -49,6 +71,8 @@ const ProductDetailPage = () => {
               height={400}
               className="object-contain transition-transform duration-500 hover:scale-105"
             />
+          ) : (
+            <p className="text-gray-400">No Image Available</p>
           )}
         </div>
 
@@ -58,8 +82,8 @@ const ProductDetailPage = () => {
             <div
               key={index}
               onClick={() => setActiveImage(img)}
-              className={`w-20 h-20 border rounded-2xl cursor-pointer flex items-center justify-center
-              ${activeImage === img ? "border-orange-600" : "border-gray-600/40"}`}
+              className={`w-20 h-20 border rounded-2xl cursor-pointer flex items-center justify-center overflow-hidden
+                ${activeImage === img ? "border-orange-600" : "border-gray-400"}`}
             >
               <Image
                 src={img}
@@ -81,7 +105,7 @@ const ProductDetailPage = () => {
             {product.name}
           </h1>
 
-          <p className="text-gray-300 font-medium text-lg">
+          <p className="text-gray-500 font-medium text-lg">
             {product.category}
           </p>
 
@@ -90,11 +114,10 @@ const ProductDetailPage = () => {
           </p>
         </div>
 
-        {/* CTA */}
+        {/* CTA BUTTONS */}
         <div className="flex flex-col sm:flex-row gap-4 mt-4">
-
           <a
-            href={`https://wa.me/919226535686?text=Hello, I am interested in ${product.name}`}
+            href={`https://wa.me/919226535686?text=Hello, I am interested in ${encodeURIComponent(product.name)}`}
             target="_blank"
             rel="noopener noreferrer"
             className="flex-1 bg-green-600 text-white px-6 py-3 rounded-2xl text-center hover:bg-green-700 transition font-medium"
@@ -108,10 +131,8 @@ const ProductDetailPage = () => {
           >
             📞 Call Now
           </a>
-
         </div>
       </div>
-
     </section>
   );
 };

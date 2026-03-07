@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -8,6 +8,7 @@ export const useAppContext = () => useContext(AppContext);
 
 export const AppContextProvider = ({ children }) => {
   const router = useRouter();
+  const API = process.env.NEXT_PUBLIC_API_URL; // backend URL from environment
   const currency = process.env.NEXT_PUBLIC_CURRENCY || "₹";
 
   /* ================= STATE ================= */
@@ -19,7 +20,7 @@ export const AppContextProvider = ({ children }) => {
   /* ================= PRODUCTS ================= */
   const fetchProductData = async () => {
     try {
-      const res = await fetch("http://localhost:8080/api/products");
+      const res = await fetch(`${API}/api/products`);
       const data = await res.json();
       setProducts(data);
     } catch (error) {
@@ -30,7 +31,7 @@ export const AppContextProvider = ({ children }) => {
   /* ================= USER ================= */
   const fetchUserData = async () => {
     try {
-      const res = await fetch("http://localhost:8080/api/users/me");
+      const res = await fetch(`${API}/api/users/me`);
       const data = await res.json();
       setUserData(data);
     } catch (error) {
@@ -39,8 +40,6 @@ export const AppContextProvider = ({ children }) => {
   };
 
   /* ================= CART ================= */
-
-  // ADD TO CART
   const addToCart = (itemId) => {
     setCartItems((prev) => ({
       ...prev,
@@ -48,32 +47,24 @@ export const AppContextProvider = ({ children }) => {
     }));
   };
 
-  // UPDATE / DELETE CART ITEM
   const updateCartQuantity = (itemId, quantity) => {
     setCartItems((prev) => {
       const updated = { ...prev };
-      if (quantity <= 0) {
-        delete updated[itemId];
-      } else {
-        updated[itemId] = quantity;
-      }
+      if (quantity <= 0) delete updated[itemId];
+      else updated[itemId] = quantity;
       return updated;
     });
   };
 
-  // TOTAL ITEMS COUNT
   const getCartCount = () => {
     return Object.values(cartItems).reduce((a, b) => a + b, 0);
   };
 
-  // TOTAL AMOUNT
   const getCartAmount = () => {
     let total = 0;
     for (let id in cartItems) {
       const product = products.find((p) => p.id == id);
-      if (product) {
-        total += product.offerPrice * cartItems[id];
-      }
+      if (product) total += product.offerPrice * cartItems[id];
     }
     return total;
   };
@@ -81,14 +72,12 @@ export const AppContextProvider = ({ children }) => {
   /* ================= INIT ================= */
   useEffect(() => {
     fetchProductData();
-    // fetchUserData(); // login ke baad use karo
+    // fetchUserData(); // enable after login
   }, []);
 
   /* ================= NOTIFICATION PERMISSION ================= */
   useEffect(() => {
-    if ("Notification" in window) {
-      Notification.requestPermission();
-    }
+    if ("Notification" in window) Notification.requestPermission();
   }, []);
 
   /* ================= PROVIDER ================= */
@@ -109,9 +98,5 @@ export const AppContextProvider = ({ children }) => {
     fetchProductData,
   };
 
-  return (
-    <AppContext.Provider value={value}>
-      {children}
-    </AppContext.Provider>
-  );
+  return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };

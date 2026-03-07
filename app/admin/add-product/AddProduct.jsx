@@ -23,13 +23,16 @@ const AddProduct = () => {
 
   const [loading, setLoading] = useState(false);
 
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
   // Fetch product when editing
   useEffect(() => {
     if (!productId) return;
 
     const fetchProduct = async () => {
       try {
-        const res = await fetch(`http://localhost:8080/api/products/${productId}`);
+        const res = await fetch(`${API_URL}/api/products/${productId}`);
+        if (!res.ok) throw new Error("Failed to fetch product");
         const data = await res.json();
 
         setName(data.name || "");
@@ -43,9 +46,7 @@ const AddProduct = () => {
         if (data.imageUrls) {
           const first = data.imageUrls.split(",")[0].trim();
           setPreview(
-            first.startsWith("http")
-              ? first
-              : `http://localhost:8080/uploads/${first}`
+            first.startsWith("http") ? first : `${API_URL}/uploads/${first}`
           );
         }
       } catch (err) {
@@ -54,19 +55,17 @@ const AddProduct = () => {
     };
 
     fetchProduct();
-  }, [productId]);
+  }, [productId, API_URL]);
 
-  // Image change
+  // Handle file selection
   const handleFileChange = (e) => {
     const selected = e.target.files?.[0];
     if (!selected) return;
-
-    const previewUrl = URL.createObjectURL(selected);
     setFile(selected);
-    setPreview(previewUrl);
+    setPreview(URL.createObjectURL(selected));
   };
 
-  // Submit
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (loading) return;
@@ -75,38 +74,30 @@ const AddProduct = () => {
 
     try {
       const formData = new FormData();
-
       formData.append("name", name);
       formData.append("description", description);
       formData.append("category", category);
 
-      if (file) {
-        formData.append("images", file);
-      }
+      if (file) formData.append("images", file);
 
       formData.append("headerSlider", headerSlider ? "true" : "false");
       formData.append("featured", featured ? "true" : "false");
       formData.append("banner", banner ? "true" : "false");
 
       const url = productId
-        ? `http://localhost:8080/api/products/${productId}`
-        : `http://localhost:8080/api/products`;
+        ? `${API_URL}/api/products/${productId}`
+        : `${API_URL}/api/products`;
 
       const method = productId ? "PUT" : "POST";
 
-      const res = await fetch(url, {
-        method,
-        body: formData,
-      });
-
-      if (!res.ok) throw new Error("Failed");
+      const res = await fetch(url, { method, body: formData });
+      if (!res.ok) throw new Error("Request failed");
 
       alert(productId ? "Product updated successfully" : "Product added successfully");
-
       router.push("/admin/product-list");
     } catch (err) {
       console.error(err);
-      alert("Something went wrong");
+      alert("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -119,10 +110,8 @@ const AddProduct = () => {
         {/* IMAGE */}
         <div>
           <p className="text-base font-medium">Product Image</p>
-
           <label className="relative mt-2 inline-block">
             <input type="file" hidden onChange={handleFileChange} />
-
             <Image
               src={preview || assets.upload_area}
               alt="Product Image"
@@ -136,7 +125,6 @@ const AddProduct = () => {
         {/* NAME */}
         <div className="flex flex-col gap-1">
           <label>Product Name</label>
-
           <input
             type="text"
             required
@@ -149,7 +137,6 @@ const AddProduct = () => {
         {/* DESCRIPTION */}
         <div className="flex flex-col gap-1">
           <label>Description</label>
-
           <textarea
             rows={4}
             required
@@ -162,7 +149,6 @@ const AddProduct = () => {
         {/* CATEGORY */}
         <div className="flex flex-col gap-1">
           <label>Category</label>
-
           <select
             className="border px-3 py-2 rounded"
             value={category}
@@ -178,7 +164,6 @@ const AddProduct = () => {
 
         {/* CHECKBOXES */}
         <div className="flex flex-col gap-2 mt-2">
-
           <label className="flex items-center gap-2">
             <input
               type="checkbox"
@@ -208,7 +193,6 @@ const AddProduct = () => {
             />
             Banner
           </label>
-
         </div>
 
         <button

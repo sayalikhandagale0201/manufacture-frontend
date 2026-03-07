@@ -5,9 +5,9 @@ import Link from "next/link";
 import { FaWhatsapp } from "react-icons/fa";
 
 const ProductCard = ({ product }) => {
-
   const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
+  // Split images
   const images = product.imageUrls
     ? product.imageUrls.split(",").map((img) => img.trim())
     : [];
@@ -20,6 +20,7 @@ const ProductCard = ({ product }) => {
       : `${API}/uploads/${firstImage}`
     : null;
 
+  // WhatsApp message
   const whatsappMessage = encodeURIComponent(
     `Hello,
 I am interested in the following product:

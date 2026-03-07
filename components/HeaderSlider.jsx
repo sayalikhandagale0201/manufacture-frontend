@@ -1,10 +1,11 @@
-"use client";
+'use client';
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
-const API_BASE = "http://localhost:8080";
+// Use deployed backend URL from env
+const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
 const HeaderSlider = () => {
   const router = useRouter();
@@ -45,8 +46,7 @@ const HeaderSlider = () => {
     return () => clearInterval(timer);
   }, [banners]);
 
-  if (loading) return null;
-  if (banners.length === 0) return null;
+  if (loading || banners.length === 0) return null;
 
   return (
     <section className="max-w-7xl mx-auto px-6 mt-6">
