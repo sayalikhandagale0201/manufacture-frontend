@@ -10,7 +10,7 @@ const ProductDetailPage = () => {
   const [activeImage, setActiveImage] = useState("");
   const [loading, setLoading] = useState(true);
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+  const API_URL = "https://manufacture-backend-oksf.onrender.com";
 
   useEffect(() => {
     if (!id) return;

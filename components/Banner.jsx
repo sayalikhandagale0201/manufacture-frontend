@@ -11,7 +11,7 @@ const Banner = () => {
   useEffect(() => {
     const fetchBanner = async () => {
       try {
-        const res = await fetch("http://localhost:8080/api/products/banner");
+        const res = await fetch("https://manufacture-backend-oksf.onrender.com/api/products/banner");
         if (!res.ok) return;
         const data = await res.json();
         setBanner(data);
@@ -28,7 +28,7 @@ const Banner = () => {
   const firstImage = banner.imageUrls?.split(",")[0]?.trim() || "";
   const imageUrl = firstImage.startsWith("http")
     ? firstImage
-    : `http://localhost:8080/uploads/${firstImage}`;
+    : `https://manufacture-backend-oksf.onrender.com/uploads/${firstImage}`;
 
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16 md:mt-24">

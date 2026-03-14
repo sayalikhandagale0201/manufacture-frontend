@@ -9,7 +9,7 @@ const ProductListPage = () => {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+  const API_URL = "https://manufacture-backend-oksf.onrender.com";
 
   const fetchProducts = async () => {
     try {

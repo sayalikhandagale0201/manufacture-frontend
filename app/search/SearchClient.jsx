@@ -12,7 +12,7 @@ export default function SearchClient() {
   const [products, setProducts] = useState([]);
 
   // Use deployed backend URL from env
-  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+  const API_URL = "https://manufacture-backend-oksf.onrender.com";
 
   useEffect(() => {
     if (!query) return;
